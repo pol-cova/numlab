@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="p-6 max-w-3xl mx-auto text-zinc-800">
+    <!-- Título -->
+    <h1 class="text-2xl font-extrabold mb-4 text-zinc-900">🚧 Errores en Métodos Numéricos</h1>
+
+    <!-- Mensaje de construcción -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <span class="text-2xl">👷</span>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-lg font-medium text-yellow-800">Sección en Construcción</h3>
+                <p class="mt-2 text-yellow-700">
+                    Estamos trabajando en esta sección para traerte contenido sobre:
+                </p>
+                <ul class="list-disc ml-5 mt-2 text-yellow-700">
+                    <li>Error absoluto</li>
+                    <li>Error relativo</li>
+                    <li>Error porcentual</li>
+                    <li>Ejemplos prácticos</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de regreso -->
+    <div class="text-center mt-8">
+        <a href="/" class="inline-flex items-center gap-2 bg-zinc-800 text-white px-6 py-3 rounded-lg hover:bg-zinc-700 transition-colors">
+            <span>↩</span>
+            <span>Volver al inicio</span>
+        </a>
+    </div>
+</main>
+{% endblock %}
