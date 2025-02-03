@@ -70,7 +70,7 @@ def bisection(expression, interval_a, interval_b, epsilon, iterations):
                 "error": None,
                 "convergence": [],
                 "success": False,
-                "message": "The function has the same sign at the endpoints.",
+                "message": "No existe raiz en ese intervalo.",
                 "table": []
             }
 
@@ -191,7 +191,7 @@ def calculate_all_iterations(expression, interval_a, interval_b, epsilon):
             "success": False,
             "error": f"Ocurrio un error: {e}"
         }
-        
+
 def generate_csv(data):
     """
     Generate CSV content for the iteration table.
