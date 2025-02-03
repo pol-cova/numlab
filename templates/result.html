@@ -1,0 +1,74 @@
+<!-- class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg" -->
+<div id="result" name="result">
+    <h2 class="text-2xl font-semibold text-zinc-800 mb-4 flex items-center gap-2">
+        📊 Resultados
+    </h2>
+    
+    <!-- Gráfico de la función -->
+    <div class="mb-8">
+        <h3 class="text-xl font-semibold text-zinc-700 mb-3">Gráfico de la Función</h3>
+        <img src="{{ graph_image }}" alt="Graph of the function" class="w-full rounded-lg shadow-md"/>
+    </div>
+
+    <!-- Raíz encontrada -->
+    <div class="mb-6">
+        <h3 class="text-lg font-medium text-zinc-700 mb-2">Raíz Aproximada</h3>
+        <div class="p-4 bg-green-100 text-green-800 rounded-md shadow-md">
+            <p class="text-xl">{{ root }}</p>
+            <p class="mt-2 text-sm text-zinc-600">{{ message }}</p>
+        </div>
+    </div>
+
+    <!-- Tabla de Iteraciones -->
+    <div class="mb-6">
+        <h3 class="text-lg font-medium text-zinc-700 mb-2">Tabla de Iteraciones</h3>
+        <div class="overflow-x-auto rounded-lg shadow-lg border border-zinc-200">
+            <table class="min-w-full table-auto">
+                <thead class="bg-zinc-100">
+                    <tr class="text-left text-sm font-medium text-zinc-600">
+                        <th class="px-4 py-2">Iteración</th>
+                        <th class="px-4 py-2">a</th>
+                        <th class="px-4 py-2">b</th>
+                        <th class="px-4 py-2">p</th>
+                        <th class="px-4 py-2">f(a)</th>
+                        <th class="px-4 py-2">f(p)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table %}
+                    <tr class="border-t border-zinc-200">
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ row.iteration }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ row.a }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ row.b }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ row.p }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ row.f_a }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ row.f_p }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Botón para Descargar CSV -->
+    {% if table %}
+    <div class="mt-6 text-center">
+        <a 
+            href="/download-csv?expression={{ expression | urlencode }}&a={{ interval_a }}&b={{ interval_b }}&epsilon={{ epsilon }}"
+            class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+        >
+            Descargar CSV
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function downloadCSV() {
+        const csvContent = "data:text/csv;charset=utf-8," + "{{ csv_data }}";
+        const link = document.createElement("a");
+        link.setAttribute("href", csvContent);
+        link.setAttribute("download", "iteraciones.csv");
+        link.click();
+    }
+</script>
