@@ -95,6 +95,10 @@ async def download_csv(
 async def errores(request: Request):
     return templates.TemplateResponse("errors.html", {"request": request})
 
+@app.get("/newton-raphson")
+async def errores(request: Request):
+    return templates.TemplateResponse("construction.html", {"request": request})
+
 @app.exception_handler(404)
 async def custom_404_handler(request, __):
     return templates.TemplateResponse("404.html", {"request": request})
