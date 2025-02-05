@@ -18,7 +18,6 @@ During our studies, my classmates and I found it challenging to understand and a
 
 - **Backend:** FastAPI (Python)
 - **Frontend:** HTMX, TailwindCSS
-- **Database:** SQLite (or other relational databases)
 - **Other Tools:** NumPy, SciPy, Matplotlib (for numerical computations and visualizations)
 
 ## Getting Started
