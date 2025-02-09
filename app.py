@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from urllib.parse import unquote
 
 from methods.bisection import expression_graph, bisection, generate_csv, calculate_all_iterations
-
+from methods.errors import get_relative_error, get_absolute_error, get_real_error
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
@@ -94,6 +94,27 @@ async def download_csv(
 @app.get("/errores")
 async def errores(request: Request):
     return templates.TemplateResponse("errors.html", {"request": request})
+
+@app.post("/errores")
+async def calculate_errores(request: Request):
+    form_data = await request.form()
+    p = float(form_data["p"])
+    aprox = float(form_data["aprox"])
+    # Perform the calcs
+    real = get_real_error(p,aprox)
+    relative =get_relative_error(p,aprox)
+    absolute = get_absolute_error(p,aprox)
+    porcentual = relative * 100
+    return templates.TemplateResponse(
+        "result-errors.html",
+        {
+            "request": request,
+            "real": real,
+            "relative": relative,
+            "absolute": absolute,
+            "porcentual":porcentual
+        }
+    )
 
 @app.get("/newton-raphson")
 async def errores(request: Request):
