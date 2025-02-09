@@ -1,0 +1,47 @@
+<div id="result" name="result">
+    <h2 class="text-2xl font-semibold text-zinc-800 mb-4 flex items-center gap-2">
+        📊 Resultados
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Error Real -->
+        <div class="bg-white p-4 rounded-lg shadow-md border border-zinc-200">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">📏</span>
+                <h3 class="text-base font-medium text-zinc-800">Error Real</h3>
+            </div>
+            <p class="text-xl font-bold text-zinc-900 mb-2 break-words">{{ real }}</p>
+            <p class="text-xs text-zinc-600">Diferencia entre valor real y aproximado</p>
+        </div>
+
+        <!-- Error Absoluto -->
+        <div class="bg-white p-4 rounded-lg shadow-md border border-zinc-200">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">📐</span>
+                <h3 class="text-base font-medium text-zinc-800">Error Absoluto</h3>
+            </div>
+            <p class="text-xl font-bold text-zinc-900 mb-2 break-words">{{ absolute }}</p>
+            <p class="text-xs text-zinc-600">Valor absoluto del error real</p>
+        </div>
+
+        <!-- Error Relativo -->
+        <div class="bg-white p-4 rounded-lg shadow-md border border-zinc-200">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">📊</span>
+                <h3 class="text-base font-medium text-zinc-800">Error Relativo</h3>
+            </div>
+            <p class="text-xl font-bold text-zinc-900 mb-2 break-words">{{ relative }}</p>
+            <p class="text-xs text-zinc-600">Error absoluto entre valor real</p>
+        </div>
+
+        <!-- Error Porcentual -->
+        <div class="bg-white p-4 rounded-lg shadow-md border border-zinc-200">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">💯</span>
+                <h3 class="text-base font-medium text-zinc-800">Error Porcentual</h3>
+            </div>
+            <p class="text-xl font-bold text-zinc-900 mb-2 break-words">{{ porcentual }}%</p>
+            <p class="text-xs text-zinc-600">Error relativo en porcentaje</p>
+        </div>
+    </div>
+</div>
