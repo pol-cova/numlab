@@ -120,6 +120,11 @@ async def calculate_errores(request: Request):
 async def errores(request: Request):
     return templates.TemplateResponse("construction.html", {"request": request})
 
+# Default in construction route for new future pages
+@app.get("/construction")
+async def errores(request: Request):
+    return templates.TemplateResponse("construction.html", {"request": request})
+
 @app.exception_handler(404)
 async def custom_404_handler(request, __):
     return templates.TemplateResponse("404.html", {"request": request})
