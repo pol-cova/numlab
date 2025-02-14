@@ -6,6 +6,9 @@ from urllib.parse import unquote
 
 from methods.bisection import expression_graph, bisection, generate_csv, calculate_all_iterations
 from methods.errors import get_relative_error, get_absolute_error, get_real_error
+from methods.newton_raphson import expression_graph as expression_graph_newton
+from methods.newton_raphson import calculate_all_iterations as calculate_all_iterations_newton
+from methods.newton_raphson import newton_raphson, generate_csv as generate_csv_newton
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
@@ -118,7 +121,70 @@ async def calculate_errores(request: Request):
 
 @app.get("/newton-raphson")
 async def errores(request: Request):
-    return templates.TemplateResponse("construction.html", {"request": request})
+    return templates.TemplateResponse("newtonr.html", {"request": request})
+
+@app.post("/newton-raphson")
+async def calculate_newton_raphson(request: Request):
+    form_data = await request.form()
+    expression = form_data["expression"]
+    x0 = float(form_data["x0"])
+    epsilon = float(form_data["epsilon"])
+    iterations = int(form_data["iterations"])
+    # Perform the newton-raphson method
+    result = newton_raphson(expression, x0, epsilon, iterations)
+    # Graph the function
+    graph_image = expression_graph_newton(expression, x0, result["root"]) if result["root"] is not None else None    # Generate CSV content if there are iterations data
+    csv_data = generate_csv_newton(result["table"]) if result["table"] else ""
+    return templates.TemplateResponse(
+        "result-newton.html",
+        {
+            "request": request,
+            "graph_image": graph_image,
+            "root": result["root"],
+            "iterations": result["iterations"],
+            "error": result["error"],
+            "convergence": result["convergence"],
+            "message": result["message"],
+            "table": result["table"],
+            "expression": expression,
+            "x0": x0,
+            "epsilon": epsilon,
+            "max_iterations": iterations,
+        }
+    )
+
+@app.get("/download-csv-newton")
+async def download_csv_newton(
+    request: Request,
+    expression: str = Query(...),
+    x0: float = Query(...),
+    epsilon: float = Query(...),
+):
+    try:
+        decoded_expression = unquote(expression)
+        result = calculate_all_iterations_newton(decoded_expression, x0, epsilon)  # Use reasonable max_iterations
+        
+        if not result["success"]:
+            return Response(
+                content=f"Error: {result.get('error', 'Unknown error')}",
+                media_type="text/plain",
+                status_code=400
+            )
+        
+        csv_data = generate_csv_newton(result["table"])
+        return Response(
+            content=csv_data,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment;filename=newton_{decoded_expression.replace(' ', '_')}.csv"
+            }
+        )
+    except Exception as e:
+        return Response(
+            content=f"Error processing request: {str(e)}",
+            media_type="text/plain",
+            status_code=400
+        )
 
 # Default in construction route for new future pages
 @app.get("/construction")
