@@ -11,6 +11,8 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
@@ -29,7 +31,26 @@
                 });
             });
         </script>
-        
+        <style>
+            .plot-container {
+                width: 100%;
+                height: 600px;
+                position: relative;
+            }
+            
+            .js-plotly-plot {
+                width: 100%;
+                height: 100%;
+            }
+            
+            .math-box {
+                padding: 1rem;
+                margin: 1rem 0;
+                background: #f8fafc;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+        </style>
         <script src="https://unpkg.com/@tailwindcss/browser@4"></script><script>
             tailwind.config = {
                 theme: {
@@ -83,12 +104,8 @@
                 <a href="/errores" class="block text-zinc-800 font-medium hover:text-blue-600">> Errores</a>
                 <a href="/biseccion" class="block text-zinc-800 font-medium hover:text-blue-600">> Bisección</a>
                 <a href="/newton-raphson" class="block text-zinc-800 font-medium hover:text-blue-600">> Newton-Raphson</a>
-                <strong class="text-blue-800">Variable compleja</strong>
-                <a href="/construction" class="block text-zinc-800 font-medium hover:text-blue-600">> Operaciones basicas complejas</a>
-                <a href="/construction" class="block text-zinc-800 font-medium hover:text-blue-600">> Conversión polar y rectangular</a>
-                <a href="/construction" class="block text-zinc-800 font-medium hover:text-blue-600">> Raices y potencias complejas</a>
                 <strong class="text-blue-800">Electrónica de potencia</strong>
-                <a href="/construction" class="block text-zinc-800 font-medium hover:text-blue-600">> Bisección en electrónica</a>
+                <a href="/schockley" class="block text-zinc-800 font-medium hover:text-blue-600">> Diodo de Schockley</a>
                 
             </nav>
         </aside>
