@@ -1,14 +1,16 @@
-from fastapi import FastAPI, Request, Query
+from fastapi import FastAPI, Request, Query, Form
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from urllib.parse import unquote
-
-from methods.bisection import expression_graph, bisection, generate_csv, calculate_all_iterations
+import base64
+from methods.bisection import expression_graph, bisection, generate_csv, calculate_all_iterations, electronic_bisection
 from methods.errors import get_relative_error, get_absolute_error, get_real_error
 from methods.newton_raphson import expression_graph as expression_graph_newton
 from methods.newton_raphson import calculate_all_iterations as calculate_all_iterations_newton
 from methods.newton_raphson import newton_raphson, generate_csv as generate_csv_newton
+import json 
+
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
@@ -185,6 +187,67 @@ async def download_csv_newton(
             media_type="text/plain",
             status_code=400
         )
+
+@app.get("/secante")
+async def secantes(request: Request):
+    return templates.TemplateResponse("secante.html", {"request": request})
+
+# Power electronics
+@app.get("/schockley")
+async def schockley(request: Request):
+    return templates.TemplateResponse("schockley.html", {"request": request})
+
+@app.post("/schockley")
+async def calculate_schockley(request: Request):
+    form_data = await request.form()
+    try:
+        # Get form data and convert to appropriate types
+        vd1 = float(form_data["vd1"])
+        id1 = float(form_data["id1"])
+        vd2 = float(form_data["vd2"])
+        id2 = float(form_data["id2"])
+        epsilon = float(form_data["epsilon"])
+        iterations = int(form_data["iterations"])
+        temp = float(form_data["temp"])
+
+        # Perform the electronic bisection method
+        result = electronic_bisection(vd1, id1, vd2, id2, epsilon, iterations, temp)
+
+        return templates.TemplateResponse(
+            "result-schockley.html",
+            {
+                "request": request,
+                "Is": result["Is"],
+                "n": result["n"],
+                "iterations": result["iterations"],
+                "error": result["error"],
+                "message": result["message"],
+                "table": result["table"],
+                "success": result["success"],
+                "is_formatted": result["is_formatted"],
+                "n_formatted": result["n_formatted"],
+                "vd1": vd1,
+                "id1": id1,
+                "vd2": vd2,
+                "id2": id2,
+                "temp": temp
+            }
+        )
+
+    except Exception as e:
+        return templates.TemplateResponse(
+            "result-schockley.html",
+            {
+                "request": request,
+                "success": False,
+                "message": f"Error en el cálculo: {str(e)}",
+                "table": []
+            }
+        )
+
+
+# Utils routes for development
+
 
 # Default in construction route for new future pages
 @app.get("/construction")

@@ -209,17 +209,17 @@ def generate_csv(data):
     return output.getvalue()
 
 # Bisection for power electronics
-# Parameters --Based on the books
-# Boltzmann constant
-k=1.38064852e-23
-# Electron q
-q=1.60217662e-19
-# Temp
-T=298
-# VT
-VT=k*T/q
+def electronic_bisection(vd1, id1, vd2, id2, epsilon, iterations, temp):
 
-def electronic_bisection(vd1, id1, vd2, id2, epsilon, iterations):
+    # Parameters --Based on the books
+    # Boltzmann constant
+    k=1.38064852e-23
+    # Electron q
+    q=1.60217662e-19
+    # Temp
+    T=273 + temp
+    # VT
+    VT=k*T/q
     """
     Implements bisection method for finding diode parameters (Is and n).
     Args:
@@ -232,7 +232,7 @@ def electronic_bisection(vd1, id1, vd2, id2, epsilon, iterations):
     """
     try:
         # Initial interval for Is (saturation current)
-        a = 1e-3  # Lower bound
+        a = 1e-5  # Lower bound
         b = 10    # Upper bound
         
         iterations_data = []

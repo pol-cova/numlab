@@ -1,0 +1,85 @@
+<div id="result" class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <h2 class="text-2xl font-semibold text-zinc-800 mb-4 flex items-center gap-2">
+        📊 Resultados del Diodo
+    </h2>
+
+    {% if success %}
+    <!-- Parámetros encontrados -->
+    <div class="mb-6">
+        <h3 class="text-lg font-medium text-zinc-700 mb-2">Parámetros del Diodo</h3>
+        <div class="p-4 bg-green-100 text-green-800 rounded-md shadow-md">
+            <p class="text-xl mb-2">Corriente de saturación (Is): {{ is_formatted }} A</p>
+            <p class="text-xl">Coeficiente de emisión (n): {{ n_formatted }}</p>
+            <p class="mt-2 text-sm text-zinc-600">{{ message }}</p>
+        </div>
+    </div>
+
+    <!-- Datos de entrada -->
+    <div class="mb-6">
+        <h3 class="text-lg font-medium text-zinc-700 mb-2">Datos de entrada</h3>
+        <div class="grid grid-cols-2 gap-4 p-4 bg-zinc-50 rounded-md">
+            <div>
+                <p class="text-sm text-zinc-600">Punto 1:</p>
+                <p class="font-medium">Vd1 = {{ vd1 }} V</p>
+                <p class="font-medium">Id1 = {{ id1 }} A</p>
+            </div>
+            <div>
+                <p class="text-sm text-zinc-600">Punto 2:</p>
+                <p class="font-medium">Vd2 = {{ vd2 }} V</p>
+                <p class="font-medium">Id2 = {{ id2 }} A</p>
+            </div>
+            <div class="col-span-2">
+                <p class="text-sm text-zinc-600">Temperatura:</p>
+                <p class="font-medium">T = {{ temp }}°C</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Iteraciones -->
+    <div class="mb-6">
+        <h3 class="text-lg font-medium text-zinc-700 mb-2">Tabla de Iteraciones</h3>
+        <div class="overflow-x-auto rounded-lg shadow-lg border border-zinc-200">
+            <table class="min-w-full table-auto">
+                <thead class="bg-zinc-100">
+                    <tr class="text-left text-sm font-medium text-zinc-600">
+                        <th class="px-4 py-2">Iteración</th>
+                        <th class="px-4 py-2">a</th>
+                        <th class="px-4 py-2">b</th>
+                        <th class="px-4 py-2">Is</th>
+                        <th class="px-4 py-2">f(a)</th>
+                        <th class="px-4 py-2">f(m)</th>
+                        <th class="px-4 py-2">Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table %}
+                    <tr class="border-t border-zinc-200">
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ row.iteration }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ "%.2e"|format(row.a) }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ "%.2e"|format(row.b) }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ "%.2e"|format(row.Is) }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ "%.2e"|format(row.f_a) }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ "%.2e"|format(row.f_m) }}</td>
+                        <td class="px-4 py-2 text-sm text-zinc-600">{{ "%.2e"|format(row.error) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Error message -->
+    <div class="p-4 bg-red-100 text-red-800 rounded-md shadow-md">
+        <p class="text-xl">{{ message }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Back button -->
+    <div class="mt-6 text-center">
+        <a href="/schockley" 
+           class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+            Calcular Otros Parámetros
+        </a>
+    </div>
+</div>
