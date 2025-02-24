@@ -5,14 +5,14 @@ import base64
 import io
 import csv
 
-def secant_graph(expression, x0, x1, root=None):
+def regula_falsi_graph(expression, a, b, root=None):
     """
-    Generates a graph of the function with secant lines.
+    Generates a graph of the function with the false position line.
 
     Args:
         expression (str): Function expression as a string.
-        x0 (float): First initial guess.
-        x1 (float): Second initial guess.
+        a (float): Left endpoint of interval.
+        b (float): Right endpoint of interval.
         root (float, optional): Calculated root.
 
     Returns:
@@ -24,7 +24,7 @@ def secant_graph(expression, x0, x1, root=None):
     func = sp.lambdify(x, f, "numpy")
     
     # Define plot range
-    x_min, x_max = min(x0, x1) - 2, max(x0, x1) + 2
+    x_min, x_max = min(a, b) - 2, max(a, b) + 2
     x_vals = np.linspace(x_min, x_max, 400)
     y_vals = func(x_vals)
     
@@ -32,22 +32,21 @@ def secant_graph(expression, x0, x1, root=None):
     plt.figure(figsize=(8, 6))
     plt.plot(x_vals, y_vals, label=f'f(x) = {expression}')
     
-    # Plot secant line
-    y0, y1 = func(x0), func(x1)
-    plt.plot([x0, x1], [y0, y1], '--r', label='Secante')
+    # Plot false position line
+    y_a, y_b = func(a), func(b)
+    plt.plot([a, b], [y_a, y_b], '--r', label='Línea de Falsa Posición')
 
     # Mark root if available
     if root is not None:
         plt.scatter(root, 0, color='green', zorder=5, label=f'Raíz en x = {root:.4f}')
     
-    # Mark points
-    plt.scatter([x0, x1], [y0, y1], color='red', zorder=5)
+    # Mark interval points
+    plt.scatter([a, b], [y_a, y_b], color='red', zorder=5)
     
-    # Axes and grid
     plt.axhline(0, color='black', linewidth=0.5)
     plt.axvline(0, color='black', linewidth=0.5)
     plt.grid(True)
-    plt.title('Gráfico de f(x) y línea secante')
+    plt.title('Gráfico de f(x) y Método de Falsa Posición')
     plt.xlabel('x')
     plt.ylabel('y')
     plt.legend()
@@ -61,19 +60,19 @@ def secant_graph(expression, x0, x1, root=None):
     
     return f"data:image/png;base64,{img_base64}"
 
-def secant_method(expression, x0, x1, epsilon=1e-6, max_iterations=100):
+def regula_falsi_method(expression, a, b, epsilon=1e-6, max_iterations=100):
     """
-    Implements the Secant method to approximate the root of a function.
+    Implements the Regula Falsi method to find a root.
 
     Args:
         expression (str): Function as a string.
-        x0 (float): First initial approximation.
-        x1 (float): Second initial approximation.
+        a (float): Left endpoint of interval.
+        b (float): Right endpoint of interval.
         epsilon (float): Error tolerance.
         max_iterations (int): Maximum iterations.
 
     Returns:
-        dict: Contains the root, error, iteration count, convergence list, and success status.
+        dict: Contains the root, error, iteration count, and convergence data.
     """
     try:
         x = sp.Symbol('x')
@@ -81,55 +80,70 @@ def secant_method(expression, x0, x1, epsilon=1e-6, max_iterations=100):
         f = sp.sympify(f_expr)
         f_num = sp.lambdify(x, f, "numpy")
         
+        f_a = f_num(a)
+        f_b = f_num(b)
+        
+        # Check if the interval is valid
+        if f_a * f_b >= 0:
+            return {
+                "root": None,
+                "iterations": 0,
+                "error": None,
+                "convergence": [],
+                "success": False,
+                "message": "El intervalo no es válido: f(a) y f(b) deben tener signos opuestos",
+                "table": []
+            }
+        
         iterations_data = []
         convergence = []
+        prev_c = None
         
         for i in range(1, max_iterations + 1):
-            f_x0, f_x1 = f_num(x0), f_num(x1)
-
-            if abs(f_x1 - f_x0) < 1e-10:
-                return {
-                    "root": None,
-                    "iterations": i,
-                    "error": None,
-                    "convergence": convergence,
-                    "success": False,
-                    "message": "División por cero detectada.",
-                    "table": iterations_data
-                }
+            # Calculate the false position point
+            c = b - (f_b * (b - a)) / (f_b - f_a)
+            f_c = f_num(c)
             
-            # Compute next approximation
-            x_next = x1 - f_x1 * (x1 - x0) / (f_x1 - f_x0)
-            abs_error = abs(x_next - x1)
-            f_next = f_num(x_next)
-
+            # Calculate absolute error if possible
+            abs_error = abs(c - prev_c) if prev_c is not None else None
+            
             iterations_data.append({
                 "iteration": i,
-                "Pn": x_next,
-                "f(Pn)": f_next,
+                "a": a,
+                "b": b,
+                "c": c,
+                "f(c)": f_c,
                 "absolute error": abs_error
             })
             
-            convergence.append(x_next)
-
-            # Stopping criteria
-            if abs_error < epsilon or abs(f_next) < epsilon:
+            convergence.append(c)
+            
+            # Check for convergence
+            if abs_error is not None and abs_error < epsilon:
                 return {
-                    "root": x_next,
+                    "root": c,
                     "iterations": i,
-                    "error": abs(f_next),
+                    "error": abs(f_c),
                     "convergence": convergence,
                     "success": True,
                     "message": f"Raíz encontrada en {i} iteraciones",
                     "table": iterations_data
                 }
             
-            x0, x1 = x1, x_next
+            # Update interval
+            if f_c * f_b < 0:
+                a = a
+                f_a = f_a
+            else:
+                a = c
+                f_a = f_c
+            
+            prev_c = c
         
         return {
-            "root": None,
+            "root": c,
             "iterations": max_iterations,
-            "error": abs(f_num(x1)),
+            "error": abs(f_c),
             "convergence": convergence,
             "success": False,
             "message": "Máximo de iteraciones alcanzado",
@@ -147,7 +161,7 @@ def secant_method(expression, x0, x1, epsilon=1e-6, max_iterations=100):
             "table": []
         }
 
-def generate_csv_secant(data, filename="secant_results.csv"):
+def generate_csv_regula_falsi(data, filename="regula_falsi_results.csv"):
     """
     Generates a CSV file from the iteration table.
 
@@ -159,7 +173,7 @@ def generate_csv_secant(data, filename="secant_results.csv"):
         str: CSV content.
     """
     output = io.StringIO()
-    fieldnames = ["iteration", "Pn", "f(Pn)", "absolute error"]
+    fieldnames = ["iteration", "a", "b", "c", "f(c)", "absolute error"]
     writer = csv.DictWriter(output, fieldnames=fieldnames)
     writer.writeheader()
     writer.writerows(data)
