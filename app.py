@@ -9,6 +9,9 @@ from methods.errors import get_relative_error, get_absolute_error, get_real_erro
 from methods.newton_raphson import expression_graph as expression_graph_newton
 from methods.newton_raphson import calculate_all_iterations as calculate_all_iterations_newton
 from methods.newton_raphson import newton_raphson, generate_csv as generate_csv_newton
+from methods.secant import secant_method, secant_graph, generate_csv_secant
+from methods.regula_falsi import regula_falsi_method, regula_falsi_graph, generate_csv_regula_falsi
+
 import json 
 
 app = FastAPI()
@@ -192,6 +195,169 @@ async def download_csv_newton(
 async def secantes(request: Request):
     return templates.TemplateResponse("secante.html", {"request": request})
 
+@app.post("/secante")
+async def calculate_secant(request: Request):
+    form_data = await request.form()
+    try:
+        expression = form_data["expression"]
+        x0 = float(form_data["x0"])
+        x1 = float(form_data["x1"])
+        epsilon = float(form_data["epsilon"])
+        iterations = int(form_data["iterations"])
+
+        # Perform the secant method
+        result = secant_method(expression, x0, x1, epsilon, iterations)
+        
+        # Generate graph
+        graph_image = secant_graph(expression, x0, x1, result["root"]) if result["root"] is not None else None
+
+        return templates.TemplateResponse(
+            "result-secante.html",
+            {
+                "request": request,
+                "graph_image": graph_image,
+                "root": result["root"],
+                "iterations": result["iterations"],
+                "error": result["error"],
+                "convergence": result["convergence"],
+                "message": result["message"],
+                "table": result["table"],
+                "expression": expression,
+                "x0": x0,
+                "x1": x1,
+                "epsilon": epsilon,
+                "max_iterations": iterations,
+                "success": result["success"]
+            }
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "result-secante.html",
+            {
+                "request": request,
+                "success": False,
+                "message": f"Error en el cálculo: {str(e)}",
+                "table": []
+            }
+        )
+
+@app.get("/download-csv-secante")
+async def download_csv_secant(
+    request: Request,
+    expression: str = Query(...),
+    x0: float = Query(...),
+    x1: float = Query(...),
+    epsilon: float = Query(...),
+):
+    try:
+        decoded_expression = unquote(expression)
+        result = secant_method(decoded_expression, x0, x1, epsilon)
+        
+        if not result["success"]:
+            return Response(
+                content=f"Error: {result.get('error', 'Unknown error')}",
+                media_type="text/plain",
+                status_code=400
+            )
+        
+        csv_data = generate_csv_secant(result["table"])
+        return Response(
+            content=csv_data,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment;filename=secant_{decoded_expression.replace(' ', '_')}.csv"
+            }
+        )
+    except Exception as e:
+        return Response(
+            content=f"Error processing request: {str(e)}",
+            media_type="text/plain",
+            status_code=400
+        )
+
+@app.get("/regula-falsi")
+async def regula_falsi_page(request: Request):
+    return templates.TemplateResponse("regula_f.html", {"request": request})
+
+@app.post("/regula-falsi")
+async def calculate_regula_falsi(request: Request):
+    form_data = await request.form()
+    try:
+        expression = form_data["expression"]
+        interval_a = float(form_data["interval_a"])
+        interval_b = float(form_data["interval_b"])
+        epsilon = float(form_data["epsilon"])
+        iterations = int(form_data["iterations"])
+
+        # Perform the regula falsi method
+        result = regula_falsi_method(expression, interval_a, interval_b, epsilon, iterations)
+        
+        # Generate graph
+        graph_image = regula_falsi_graph(expression, interval_a, interval_b, result["root"]) if result["root"] is not None else None
+
+        return templates.TemplateResponse(
+            "result-regula.html",
+            {
+                "request": request,
+                "graph_image": graph_image,
+                "root": result["root"],
+                "iterations": result["iterations"],
+                "error": result["error"],
+                "convergence": result["convergence"],
+                "message": result["message"],
+                "table": result["table"],
+                "expression": expression,
+                "interval_a": interval_a,
+                "interval_b": interval_b,
+                "epsilon": epsilon,
+                "max_iterations": iterations,
+                "success": result["success"]
+            }
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "result-regula.html",
+            {
+                "request": request,
+                "success": False,
+                "message": f"Error en el cálculo: {str(e)}",
+                "table": []
+            }
+        )
+
+@app.get("/download-csv-regula-falsi")
+async def download_csv_regula_falsi(
+    request: Request,
+    expression: str = Query(...),
+    interval_a: float = Query(...),
+    interval_b: float = Query(...),
+    epsilon: float = Query(...),
+):
+    try:
+        decoded_expression = unquote(expression)
+        result = regula_falsi_method(decoded_expression, interval_a, interval_b, epsilon)
+        
+        if not result["success"]:
+            return Response(
+                content=f"Error: {result.get('error', 'Unknown error')}",
+                media_type="text/plain",
+                status_code=400
+            )
+        
+        csv_data = generate_csv_regula_falsi(result["table"])
+        return Response(
+            content=csv_data,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment;filename=regula_falsi_{decoded_expression.replace(' ', '_')}.csv"
+            }
+        )
+    except Exception as e:
+        return Response(
+            content=f"Error processing request: {str(e)}",
+            media_type="text/plain",
+            status_code=400
+        )
 # Power electronics
 @app.get("/schockley")
 async def schockley(request: Request):
